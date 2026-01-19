@@ -1,0 +1,4 @@
+b1: xóa venv (__pycache__) và tạo lại: python -m venv venv
+b2: cài các package cần thiết thông qua pip: pip install -r requirements.txt
+---- requirements.txt là file lưu các package các bạn sử dụng
+b3: chạy server: python -m uvicorn main:app --reload
