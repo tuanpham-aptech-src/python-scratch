@@ -25,10 +25,16 @@ class Product(Base):
 class ListProductDTO(BaseModel):
     id: int
     name: str
-    price: int
-    stock_qty: int
-    status: str
-    created_at: datetime
 
     class Config:
         from_attributes= True
+
+
+class CreateProductDTO(BaseModel):
+    name: str
+    price: int
+    stock_qty: int
+
+
+class RestockProductDTO(BaseModel):
+    stock_qty: int
