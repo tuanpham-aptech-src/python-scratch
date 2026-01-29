@@ -4,8 +4,11 @@ from sqlalchemy import  Column, Integer,String, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.types import Enum as SqlEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from pydantic import BaseModel
+from fastapi import HTTPException
+from app.models.user import ListUserDTO
+from app.models.order_item import ListOrderItemDTO
+from typing import Annotated
+from pydantic import BaseModel, AfterValidator
 from datetime import datetime
 from enum import Enum
 
@@ -34,9 +37,44 @@ class Order(Base):
 
 class ListOrderDTO(BaseModel):
     id: int
-    note: str
+    note: None | str # Union types
     status: str
     created_at: datetime
+    user: ListUserDTO
 
     class Config:
         from_attributes= True
+
+class DetailOrderDTO(BaseModel):
+    id: int
+    note: None | str # Union types
+    status: str
+    created_at: datetime
+    user: ListUserDTO
+    items: list[ListOrderItemDTO] = []
+
+    class Config:
+        from_attributes= True
+# {
+#   "user_id": 1,
+#   "items": [
+#     {
+#       "product_id": 2,
+#       "quantity": 100
+#     }
+#   ]
+# }
+
+def is_greater_than_zero(value: int) -> int:
+    if value <= 0:
+        raise ValueError(f"Giá trị bắt buộc phải lớn hơn 0")
+        # raise HTTPException(status_code=400, detail= {"message": "Giá trị bắt buộc phải lớn hơn 0"})
+    return value
+
+class CreateOrderItemDTO(BaseModel):
+    product_id: int
+    quantity: Annotated[int, AfterValidator(is_greater_than_zero)]
+
+class CreateOrderDTO(BaseModel):
+    user_id: int
+    items: list[CreateOrderItemDTO]
